@@ -19,9 +19,11 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Register button clicked");
 
     try {
       const response = await API.post("/auth/register", formData);
+      console.log(response); //remove after 
 
       alert(response.data.message);
 
