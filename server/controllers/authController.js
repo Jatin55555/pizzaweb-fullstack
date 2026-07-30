@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
 const registerUser = async (req, res) => {
+   console.log("🔥 registerUser route hit");
   try {
     const { name, email, password } = req.body;
     // Check if all fields are provided
