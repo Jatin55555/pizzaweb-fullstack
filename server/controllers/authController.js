@@ -54,15 +54,9 @@ const registerUser = async (req, res) => {
       verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     });
 
-    const verificationLink = `http://localhost:5173/verify-email/${verificationToken}`;
+    const verificationLink = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
 
-    // Send success response immediately
-     return res.status(201).json({
-  success: true,
-  message: "User created successfully",
-});
-
-    // Send email in background
+    // Send email in the background
     sendEmail(
       user.email,
       "Verify your PizzaWeb Account",
@@ -92,6 +86,13 @@ const registerUser = async (req, res) => {
     ).catch((err) => {
       console.error("❌ Verification email failed:", err.message);
     });
+
+    // Respond immediately
+    return res.status(201).json({
+      success: true,
+      message:
+        "Registration successful. Please check your email to verify your account.",
+    });
   } catch (error) {
     console.log(error);
 
@@ -101,8 +102,6 @@ const registerUser = async (req, res) => {
     });
   }
 };
-
-
 
 const loginUser = async (req, res) => {
   try {
