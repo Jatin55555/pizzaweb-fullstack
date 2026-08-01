@@ -4,113 +4,105 @@ const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
-// const registerUser = async (req, res) => {
-//   console.log("🔥 registerUser route hit");
-//   try {
-//     const { name, email, password } = req.body;
-//     // Check if all fields are provided
-//     if (!name || !email || !password) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "All fields are required",
-//       });
-//     }
-
-//     // Validate email
-//     if (!validator.isEmail(email)) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Invalid email format",
-//       });
-//     }
-
-//     // Validate password length
-//     if (password.length < 6) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Password must be at least 6 characters",
-//       });
-//     }
-
-//     // Check if user already exists
-//     const existingUser = await User.findOne({ email });
-
-//     if (existingUser) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "User already exists",
-//       });
-//     }
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     const verificationToken = crypto.randomBytes(32).toString("hex");
-
-//     const user = await User.create({
-//       name,
-//       email,
-//       password: hashedPassword,
-//       role: "user",
-
-//       verificationToken,
-//       verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
-//     });
-
-//     const verificationLink = `http://localhost:5173/verify-email/${verificationToken}`;
-
-//     // Send success response immediately
-//      res.status(201).json({
-//       success: true,
-//       message:
-//         "Registration successful. Please check your email to verify your account.",
-//     });
-
-//     // Send email in background
-//     sendEmail(
-//       user.email,
-//       "Verify your PizzaWeb Account",
-//       `
-//     <h2>Welcome to PizzaWeb 🍕</h2>
-
-//     <p>Thanks for registering.</p>
-
-//     <p>Please click the button below to verify your email.</p>
-
-//     <a
-//       href="${verificationLink}"
-//       style="
-//         background:#dc2626;
-//         color:white;
-//         padding:12px 20px;
-//         text-decoration:none;
-//         border-radius:6px;
-//         display:inline-block;
-//       "
-//     >
-//       Verify Email
-//     </a>
-
-//     <p>This link expires in 24 hours.</p>
-//   `,
-//     ).catch((err) => {
-//       console.error("❌ Verification email failed:", err.message);
-//     });
-//   } catch (error) {
-//     console.log(error);
-
-//     return res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// };
-
 const registerUser = async (req, res) => {
-  console.log("✅ Register route reached");
+  console.log("🔥 registerUser route hit");
+  try {
+    const { name, email, password } = req.body;
+    // Check if all fields are provided
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
 
-  return res.status(200).json({
-    success: true,
-    message: "Backend is working!",
-  });
+    // Validate email
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+      });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: "user",
+
+      verificationToken,
+      verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+    });
+
+    const verificationLink = `http://localhost:5173/verify-email/${verificationToken}`;
+
+    // Send success response immediately
+     return res.status(201).json({
+  success: true,
+  message: "User created successfully",
+});
+
+    // Send email in background
+    sendEmail(
+      user.email,
+      "Verify your PizzaWeb Account",
+      `
+    <h2>Welcome to PizzaWeb 🍕</h2>
+
+    <p>Thanks for registering.</p>
+
+    <p>Please click the button below to verify your email.</p>
+
+    <a
+      href="${verificationLink}"
+      style="
+        background:#dc2626;
+        color:white;
+        padding:12px 20px;
+        text-decoration:none;
+        border-radius:6px;
+        display:inline-block;
+      "
+    >
+      Verify Email
+    </a>
+
+    <p>This link expires in 24 hours.</p>
+  `,
+    ).catch((err) => {
+      console.error("❌ Verification email failed:", err.message);
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
+
+
 
 const loginUser = async (req, res) => {
   try {
