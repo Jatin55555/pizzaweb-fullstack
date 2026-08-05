@@ -1,38 +1,27 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-
-  // Fail fast if Gmail doesn't respond
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async (to, subject, html) => {
   console.log("📧 Sending email to:", to);
-  console.log("📧 Using email:", process.env.EMAIL_USER);
 
-  try {
-    const info = await transporter.sendMail({
-      from: `"PizzaWeb" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html,
-    });
+  const { data, error } = await resend.emails.send({
+    from: "PizzaWeb <onboarding@resend.dev>",
+    to,
+    subject,
+    html,
+  });
 
-    console.log("✅ Email sent:", info.response);
-  } catch (error) {
-    console.error("❌ Email Error:");
+  if (error) {
+    console.error("❌ Resend API Error:");
     console.error(error);
-    throw error;
+    throw new Error(error.message);
   }
+
+  console.log("✅ Email sent successfully!");
+  console.log(data);
+
+  return data;
 };
 
 module.exports = sendEmail;
